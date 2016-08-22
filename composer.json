@@ -1,9 +1,10 @@
 {
     "name": "giliweb/phusky",
     "description": "Basic PHP model framework",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.0",
+        "sergeytsalkov/meekrodb": "v2.3"
     },
     "license": "proprietary",
     "authors": [
@@ -12,19 +13,9 @@
           "email": "giliweb.it@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "giliweb/phusky",
-                "version": "dev-master",
-                "source": {
-                    "url": "git://github.com/giliweb/phusky.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-
-            }
+    "autoload": {
+        "psr-0" : {
+            "giliweb\\phusky" : "src"
         }
-    ]
+    }
 }
