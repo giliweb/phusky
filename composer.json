@@ -1,0 +1,30 @@
+{
+    "name": "giliweb/phusky",
+    "description": "Basic PHP model framework",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+          "name": "Antonio Giliberto",
+          "email": "giliweb.it@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "giliweb/phusky",
+                "version": "dev-master",
+                "source": {
+                    "url": "git://github.com/giliweb/phusky.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+
+            }
+        }
+    ]
+}
