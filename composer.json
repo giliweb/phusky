@@ -14,8 +14,8 @@
         }
     ],
     "autoload": {
-        "psr-0" : {
-            "giliweb\\phusky" : "src"
+        "psr-4" : {
+            "giliweb\\phusky\\" : "src/engine/"
         }
     }
 }
