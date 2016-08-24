@@ -68,8 +68,8 @@ class Phusky {
 	private function writeConfig(array $data){
 		$configData = 
 "<?php
-// AUTO GENERATED FILE, ANY MOD WILL BE OVERWRITTEN WITH \"composer setup ... \" COMMAND. 
-// YOU CAN LAUNCH COMMAND \"composer setup {classes folder} {db host} {db name} {db_user} {db_password} \"
+// AUTO GENERATED FILE, ANY MOD WILL BE OVERWRITTEN WITH \"composer phusky_setup ... \" COMMAND. 
+// YOU CAN LAUNCH COMMAND \"composer phusky_setup {classes folder} {db host} {db name} {db_user} {db_password} \"
 require_once 'vendor/autoload.php';
 \\DB::\$host = '{$data['db_host']}';
 \\DB::\$dbName = '{$data['db_name']}';
