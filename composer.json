@@ -17,5 +17,8 @@
         "psr-4" : {
             "giliweb\\phusky\\" : "src/engine/"
         }
+    },
+    "scripts": {
+        "phusky_setup": "giliweb\\phusky\\Install::init"
     }
 }

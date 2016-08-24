@@ -11,7 +11,11 @@ class Phusky {
 		//print_r(self::$structure);
 	}
 
+
+
 	public function setup(array $data){
+		$this->writeConfig($data);
+		require_once($data['base_path'].'/config.php');
 		self::$tables = $this->getTables();
 		foreach(self::$tables as $table){
 			self::$structure[$table] = [
@@ -59,6 +63,24 @@ class Phusky {
 				file_put_contents($path.$filename, $classData."§\r\r\r}");
 			}
 		}
+	}
+	
+	private function writeConfig(array $data){
+		$configData = 
+"<?php
+// AUTO GENERATED FILE, ANY MOD WILL BE OVERWRITTEN WITH \"composer setup ... \" COMMAND. 
+// YOU CAN LAUNCH COMMAND \"composer setup {classes folder} {db host} {db name} {db_user} {db_password} \"
+require_once 'vendor/autoload.php';
+\\DB::\$host = '{$data['db_host']}';
+\\DB::\$dbName = '{$data['db_name']}';
+\\DB::\$user = '{$data['db_user']}';
+\\DB::\$password = '{$data['db_password']}';
+spl_autoload_register(function(\$className){
+    \$path = '{$data['absolute_class_path']}/';
+    include \$path.\$className.'.php';
+});
+";
+		file_put_contents($data['base_path']. 'config.php', $configData);
 	}
 
 	private function prepareClass(array $data){
