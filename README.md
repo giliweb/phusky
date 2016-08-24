@@ -1,9 +1,7 @@
 ### Table of Contents
-**[Installation Instructions](#installation-instructions)**  
-
-
+**[Installation Instructions](#installation-instructions)**
 ## Installation Instructions
-Run: 
+Run:
 ```
 	composer require giliweb/phusky
 ```
@@ -15,8 +13,8 @@ Open composer.json and add
 ```
 Run
 ```
-	composer phusky_setup {classes folder} {db host} {db name} {db_user} {db_password}
+	composer phusky_setup -path=classes_folder -dbhost=db_host -dbname=db_name -dbuser=db_user -dbpassword=db_password
 ```
 
-    
+
 
