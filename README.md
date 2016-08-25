@@ -13,7 +13,7 @@ Open composer.json and add
 ```
 Run
 ```
-	composer phusky_setup -path=classes_folder -dbhost=db_host -dbname=db_name -dbuser=db_user -dbpassword=db_password
+	composer phusky_setup -- -path=classes_folder -dbhost=db_host -dbname=db_name -dbuser=db_user -dbpassword=db_password
 ```
 
 

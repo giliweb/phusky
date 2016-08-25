@@ -9,7 +9,7 @@ class Install {
 		global $argv;
 		$args = [
 			"base_path" => getcwd().'/',
-			"absolute_class_path" => getcwd() . '/',
+			"absolute_class_path" => getcwd() . '/class/',
 			"db_host" => 'localhost',
 			"db_name" => 'test',
 			"db_user" => 'root',
@@ -39,7 +39,7 @@ class Install {
 				case 'h':
 					die(
 "Usage:
-    composer phusky_setup -path=classes_folder -dbhost=db_host -dbname=db_name -dbuser=db_user -dbpassword=db_password
+    composer phusky_setup -- -path=classes_folder -dbhost=db_host -dbname=db_name -dbuser=db_user -dbpassword=db_password
 List of supported parameters: 
     -path             The folder where generated classes files will be saved 
     -dbhost           Database host, default to localhost

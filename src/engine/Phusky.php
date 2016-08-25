@@ -8,6 +8,7 @@ class Phusky {
 
 	public function __construct(){
 
+
 		//print_r(self::$structure);
 	}
 
@@ -145,10 +146,27 @@ class {$data['className']} extends \\giliweb\\phusky\\Model {
 		);
 		$parents = [];
 		foreach($temp as $k => $e){
+			//print_r($e);
+			//echo "SHOW FULL COLUMNS FROM $table where Field = '{$e['COLUMN_NAME']}'";
+			$field_properties = \DB::queryOneRow("SHOW FULL COLUMNS FROM $table where Field = '{$e['COLUMN_NAME']}'");
+			//var_dump($field_properties);
+			//var_dump($field_properties['Default'] === NULL ? ($field_properties['Null'] == 'Yes' ? 'NULL' : false) : $field_properties['Default']);
+			//var_dump($field_properties['Null']);
+			if($field_properties['Default'] === NULL){
+				if($field_properties['Null'] == 'YES'){
+					$default = NULL;
+				} else {
+					$default = false;
+				}
+			} else {
+				$default = $field_properties['Default'];
+			}
+			//var_dump($default);
 			$parents []= [
 				"table_name" => $e['REFERENCED_TABLE_NAME'],
 				"index" => $e['COLUMN_NAME'],
-				"class_name" => $this->tableName2ClassName($e['REFERENCED_TABLE_NAME'])
+				"class_name" => $this->tableName2ClassName($e['REFERENCED_TABLE_NAME']),
+				"default" => $default
 			];
 		}
 		return $parents;
@@ -176,7 +194,14 @@ class {$data['className']} extends \\giliweb\\phusky\\Model {
 			if(is_array($e)){
 				$e = $this->array2String($e);
 			} else {
-				$e = "\"$e\"";
+				if(is_bool($e)){
+					$e = $e === false ? 'false' : 'true';
+				} elseif($e === NULL){
+					$e = 'NULL';
+				} else {
+					$e = "\"$e\"";
+				}
+				//$e = is_bool($e) ? ($e === false ? 'false' : 'true') : "\"$e\"";
 			}
 			$temp .= is_numeric($k) ? "$e," : "\"$k\" => $e,";
 
