@@ -1,22 +1,16 @@
 <?php namespace giliweb\phusky;
 class Model implements iModel {
 
-	//private $phusky;
-	//private $old_instance;
-
 	/**
 	 * Model constructor.
 	 * @param array $data
 	 */
 	public function __construct(array $data = NULL){
-		$class = get_called_class();
 		if(!is_null($data)){
 			foreach($data as $k => $e){
 				$this->$k = $e;
 			}
 		}
-		//$this->phusky = Phusky::getInstance();
-
 		return $this;
 	}
 
@@ -61,7 +55,6 @@ class Model implements iModel {
 
 		// create children
 		$this->handleChildren();
-		//print_r($this->output());
 		return $this;
 	}
 
@@ -86,9 +79,6 @@ class Model implements iModel {
 					// query the DB to get the old children
 					if(isset($this->old_instance->$children_table_name)){
 						$old_children_array = $this->old_instance->$children_table_name;
-						//print_r($old_children_array);
-						//print_r($children_array);
-						//exit;
 						// remove old child if not is present in $children_array
 						foreach($old_children_array as $old_child){
 							if($this->findInstanceInArray($old_child, $children_array) === false){
@@ -109,10 +99,6 @@ class Model implements iModel {
 						$model = $child['class_name'];
 						$c = $c instanceof $model ? $c : new $model($c);
 						if(isset($child['join_table'])){ // there is an m:n intermediate table
-							//print_r($c);
-							//print_r($child);
-							//exit;
-							//print_r($child);
 							$child_index = $child['index'];
 							$c->create();
 							\DB::insertUpdate($child['join_table'], [
@@ -170,7 +156,6 @@ class Model implements iModel {
 	 * @return array
 	 */
 	public static function read(\Closure $fn = NULL){
-		//$where = self::parseQuery($data);
 		$r = \DB::query("select * from " . self::getTableName() ." where  %l", !is_null($fn) ? $fn() : NULL);
 		$r = new Collection(self::modelizeArray($r));
 		return $r;
@@ -190,7 +175,6 @@ class Model implements iModel {
 
 		// handle children
 		$this->handleChildren();
-		//print_r($this->output());
 		return $this;
 	}
 
@@ -198,7 +182,25 @@ class Model implements iModel {
 	 * @return bool
 	 */
 	public function delete(){
+		// delete children too
+		$this->deleteChildren();
+		// finally, delete this
 		return \DB::delete(self::getTableName(), "id=%d", $this->id);
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function deleteChildren(){
+		foreach($this->children as $child) {
+			$table_name = $child['table_name'];
+			if(isset($child['join_table'])) { // m:n relationship
+				// this should be blank
+			} else { // simple relationship
+				\DB::query("delete from $table_name where {$child['index']}=%d", $this->id);
+			}
+		}
+		return true;
 	}
 
 	/**
