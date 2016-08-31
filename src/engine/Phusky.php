@@ -180,7 +180,13 @@ class {$data['className']} extends \\giliweb\\phusky\\Model {
 		$tableName = explode('_', $tableName);
 		foreach($tableName as &$t){
 			$t = ucfirst($t);
-			if($t{strlen($t)-1} === 's'){
+			if(substr($t, -3) == 'ies') {
+				$t = substr($t, 0, -3) . 'y';
+			} elseif(substr($t, -3) == 'ves'){
+				$t = substr($t, 0, -3) . 'fe';
+			} elseif(substr($t, -2) == 'es'){
+				$t = substr($t, 0, -2);
+			} elseif($t{strlen($t)-1} == 's'){
 				$t = substr($t, 0, -1);
 			}
 		}

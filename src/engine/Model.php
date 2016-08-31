@@ -127,7 +127,7 @@ class Model implements iModel {
 						}
 					}
 				}
-				$this->$table_name = $children_array;
+				$this->$table_name = array_values($children_array);
 			}
 		}
 	}
@@ -154,6 +154,7 @@ class Model implements iModel {
 				$parent = ($this->$property_name instanceof $model) ? $this->$property_name : new $model($this->$property_name);
 				$parent->create();
 				$this->$index = $parent->id;
+				$this->$property_name = $parent;
 			} elseif($parent_id && $parent){
 				$this->$property_name = $parent;
 			} else {
@@ -168,9 +169,11 @@ class Model implements iModel {
 	 * @param \Closure $fn
 	 * @return array
 	 */
-	public static function read(\Closure $fn){
+	public static function read(\Closure $fn = NULL){
 		//$where = self::parseQuery($data);
-		return self::modelizeArray(\DB::query("select * from " . self::getTableName() ." where  %l", $fn()));
+		$r = \DB::query("select * from " . self::getTableName() ." where  %l", !is_null($fn) ? $fn() : NULL);
+		$r = new Collection(self::modelizeArray($r));
+		return $r;
 	}
 
 	/**
@@ -313,7 +316,6 @@ class Model implements iModel {
 		unset($that->old_instance);
 		foreach($that as $k => &$e){
 			if(is_array($e)){
-
 				foreach($e as &$w){
 					$w = $w !== false ? $w->output() : false;
 				}
