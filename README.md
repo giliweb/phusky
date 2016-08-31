@@ -33,7 +33,8 @@ How to use Phusky for your project:
 All of the following examples are based on the data available in the "example_db.sql"
 
 Ok, let's say we want to insert in our DB a new Car object. Model's name is "Testarossa" and we already know the brand's ID is 3:
-```
+```php
+<?php
 $car = new Car([
     "name" => "Testarossa",
     "brands_id" => 3
@@ -42,7 +43,8 @@ $car->create();
 ```
 
 But what if the brand is not yet present in the "brands" table? Just this simple:
-```
+```php
+<?php
 $car = new Car([
     "name" => "Testarossa",
     "brand" => [
@@ -55,7 +57,8 @@ $car->create();
 Phusky will provide to create and insert in our DB the brand with name "Ferrari" and associate the new car object to the new created brand.
 
 Same way we can bind some dependencies to the car object:
-```
+```php
+<?php
 $car = new Car([
     "name" => "Testarossa",
     "brand" => [
@@ -108,15 +111,18 @@ Car Object
 ## Read some data from the DB and return it as Object
 With Phusky you can get a single record or an array of records. That data will be automatically converted to the right object type as defined in the PHP classes.
 To get a single record:
-```
+```php
+<?php
 $car = Car::getById(3);
 ```
 To get multiple records:
-```
+```php
+<?php
 $cars = Car::read();
 ```
 To search something you got to pass a closure to the read method, as explained in the [MeekroDB documentation](http://meekro.com/docs.php), ie:
-```
+```php
+<?php
 $cars = Car::read(function(){
     $where = new \WhereClause('and');
     $where->add("brands_id=%d", 3);
@@ -150,16 +156,18 @@ Array
 )
 ```
 Supposing we want to know which colors are binded to those cars, we can proceed this way:
-```
+```php
+<?php
     $car->colors;
-    OR
+    // OR
     $cars->colors;
 ```
 The output will include the colors info for each car object.
 To get a clean output it's advisable to use output method:
-```
+```php
+<?php
     $car->output();
-    OR
+    // OR
     $cars->output();
 ```
 
@@ -167,14 +175,16 @@ To get a clean output it's advisable to use output method:
 As for insert procedure, Phusky will dinamically create/update any dependencies of the main object we are going to update in the DB.
 The main difference is we can delete them too!
 If we call:
-```
+```php
+<?php
 $car = Car::getById(3); // load car instance
 $car->colors = []; // empty the colors array
 $car->update(); // write on DB
 ```
 Phusky will DELETE ALL of the colors from the $car object
 Here is another example:
-```
+```php
+<?php
 $car = Car::getById(3);
 $car->colors; // load the colors for this car
 unset($car->colors[0]); // manually delete this specific color
@@ -183,7 +193,8 @@ $car->update(); // write on DB
 In this last case Phusky will delete just the first color.
 
 ## Delete
-```
+```php
+<?php
 $car = Car::getById(3);
 $car->delete();
 ```
