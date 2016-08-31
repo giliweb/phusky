@@ -120,7 +120,7 @@ To get multiple records:
 <?php
 $cars = Car::read();
 ```
-To search something you got to pass a closure to the read method, as explained in the [MeekroDB documentation](http://meekro.com/docs.php), ie:
+To search something you got to pass a closure to the read method, as explained in the [MeekroDB documentation](http://meekro.com/docs.php#anchor_whereclause), ie:
 ```php
 <?php
 $cars = Car::read(function(){
