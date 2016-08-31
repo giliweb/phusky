@@ -1,3 +1,4 @@
+[logo]: https://github.com/giliweb/phusky/raw/master/logo.png "Phusky"
 #### This guide is not yet completed
 
 ### Table of Contents
