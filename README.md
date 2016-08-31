@@ -3,10 +3,11 @@
 #### This guide is not yet completed
 
 ### Table of Contents
-**[Installation Instructions](#installation-instructions)**
-**[Create a new object and insert into DB](#Create-a-new-object-and-insert-into-DB)**
-**[Update operation](#Update-operation)**
-**[Delete](#Delete)**
+[Installation Instructions](#installation-instructions)
+[Create a new object and insert into DB](#create-a-new-object-and-insert-into-db)
+[Update operation](#update-operation)
+[Delete](#delete)
+[TODO](#todo)
 ## Installation Instructions
 Run:
 ```
