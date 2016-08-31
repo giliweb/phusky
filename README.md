@@ -1,4 +1,5 @@
-[logo]: https://github.com/giliweb/phusky/raw/master/logo.png "Phusky"
+<img src="https://github.com/giliweb/phusky/raw/master/logo.png" height="120" />
+
 #### This guide is not yet completed
 
 ### Table of Contents
