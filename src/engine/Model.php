@@ -26,12 +26,13 @@ class Model implements iModel {
 	 * @param int $id
 	 * @param array|NULL $fields
 	 * @return bool|Model
+	 * @throws PhuskyException
 	 */
 	public static function getById(int $id, array $fields = NULL){
 		$fields = is_array($fields) ? implode($fields) : '*';
 		$data = \DB::queryFirstRow("select $fields from " . self::getTableName() . " where id = '$id'");
 		if(is_null($data)){
-			return false;
+			throw new PhuskyException(PhuskyException::RECORD_NOT_FOUND, [get_called_class(), $id]);
 		}
 		$o = self::modelize($data);
 		return $o;
@@ -45,16 +46,22 @@ class Model implements iModel {
 		if(isset($this->id)){
 			return $this->update();
 		}
-
+		\DB::startTransaction();
 		// check if parents exists
-		$this->checkIfAllParentsExists();
+		$this->checkIfAllParentsExist();
 
 		// write $this on DB
-		$r = \DB::insertUpdate($this->getTableName(), $this->getWritableData());
-		$this->id = \DB::insertId();
+		try {
+			$r = \DB::insertUpdate($this->getTableName(), $this->getWritableData());
+			$this->id = \DB::insertId();
+		} catch (\Exception $e){
+			\DB::rollback();
+			throw new PhuskyException(PhuskyException::RECORD_CREATION_ERROR, [get_called_class(), print_r($e, true)]);
+		}
 
 		// create children
 		$this->handleChildren();
+		\DB::commit();
 		return $this;
 	}
 
@@ -68,11 +75,15 @@ class Model implements iModel {
 				$children_array = $this->$table_name; // new children array
 
 				if(count($children_array) <= 0){ // delete all children
-					if(isset($child['join_table'])) { // there is an m:n intermediate table
-						\DB::delete($child['join_table'], "{$child['join_index']}=%d", $this->id);
-					} else { // children are on their own table, with just a foreign key to the parent object
-						\DB::delete($child['table_name'], "{$child['index']}=%d", $this->id);
-					}
+					try {
+						if(isset($child['join_table'])) { // there is an m:n intermediate table
+							\DB::delete($child['join_table'], "{$child['join_index']}=%d", $this->id);
+						} else { // children are on their own table, with just a foreign key to the parent object
+							\DB::delete($child['table_name'], "{$child['index']}=%d", $this->id);
+						}
+					} catch (\Exception $e){
+						throw new PhuskyException(PhuskyException::DELETE_CHILDREN_ERROR, [get_called_class(), print_r($child, true), print_r($e, true)]);
+					}					
 				} else { // match new children against new children, maybe delete or add some of them
 
 					$children_table_name = $child['table_name'];
@@ -84,7 +95,12 @@ class Model implements iModel {
 							if($this->findInstanceInArray($old_child, $children_array) === false){
 								if(isset($child['join_table'])) { // there is an m:n intermediate table
 									$child_index = $child['index'];
-									\DB::query("delete from {$child['join_table']} where {$child['index']}=%d and {$child['join_index']}=%d", $old_child->$child_index, $this->id);
+									try {
+										\DB::query("delete from {$child['join_table']} where {$child['index']}=%d and {$child['join_index']}=%d", $old_child->$child_index, $this->id);
+									} catch (\Exception $e){
+										throw new PhuskyException(PhuskyException::DELETE_CHILDREN_ERROR, [get_called_class(), print_r($child, true), print_r($e, true)]);
+									}
+
 								} else { // children are on their own table, with just a foreign key to the parent object
 									$old_child->delete();
 								}
@@ -101,10 +117,14 @@ class Model implements iModel {
 						if(isset($child['join_table'])){ // there is an m:n intermediate table
 							$child_index = $child['index'];
 							$c->create();
-							\DB::insertUpdate($child['join_table'], [
-								$child['join_index'] => $this->id,
-								$child['index'] => $c->id
-							]);
+							try {
+								\DB::insertUpdate($child['join_table'], [
+									$child['join_index'] => $this->id,
+									$child['index'] => $c->id
+								]);
+							} catch(Exception $e){
+								throw new PhuskyException(PhuskyException::M_N_RELATION_CREATE_ERROR, [get_called_class(), print_r($child, true), print_r($e, true)]);
+							}
 							$c = $model::getById($c->id);
 						} else { // children are on their own table, with just a foreign key to the parent object
 							$child_index = $child['index'];
@@ -121,7 +141,7 @@ class Model implements iModel {
 	/**
 	 * @throws PhuskyException
 	 */
-	private function checkIfAllParentsExists(){
+	private function checkIfAllParentsExist(){
 		foreach($this->parents as $p){
 			$model = $p['class_name'];
 			$index = $p['index'];
@@ -129,12 +149,12 @@ class Model implements iModel {
 			$property_name = strtolower($model);
 
 			if($parent_id && !$parent = $model::getById($parent_id)){ // parent doesn't exist, try to create from extended info
-				throw new PhuskyException(get_called_class() . " index for $model ($index = $parent_id) doesn't have a correspondent record on table " . $p['table_name']);
+				throw new PhuskyException(PhuskyException::PARENT_DOESNT_EXIST_ERROR, [get_called_class(), $model, $index, $parent_id, $p['table_name']]);
 			} elseif(!$parent_id && !isset($this->$property_name)){ //
 				if($p['default'] !== false){
 					$this->$index = $p['default'];
 				} else {
-					throw new PhuskyException(get_called_class() . " needs the $model property");
+					throw new PhuskyException(PhuskyException::MISSING_PARENT_PROPERTY, [get_called_class(), $model]);
 				}
 			} elseif(!$parent_id && isset($this->$property_name)) {
 				$parent = ($this->$property_name instanceof $model) ? $this->$property_name : new $model($this->$property_name);
@@ -145,8 +165,8 @@ class Model implements iModel {
 				$this->$property_name = $parent;
 			} else {
 				//debug_print_backtrace();
-				print_r($p);
-				throw new PhuskyException("Something went wrong, you shouldn't be here!");
+
+				throw new PhuskyException(PhuskyException::OMEGA_ERROR, [print_r($p, true)]);
 			}
 		}
 	}
@@ -163,14 +183,19 @@ class Model implements iModel {
 
 	/**
 	 * @return bool
+	 * @throws PhuskyException
 	 */
 	public function update(){
 
 		// handle parents
-		$this->checkIfAllParentsExists();
+		$this->checkIfAllParentsExist();
 
 		// handle $this
-		$r = \DB::update($this->getTableName(), $this->getWritableData(), "id=%d", $this->id);
+		try {
+			$r = \DB::update($this->getTableName(), $this->getWritableData(), "id=%d", $this->id);
+		} catch(\Exception $e){
+			throw new PhuskyException(PhuskyException::UPDATE_ERROR, [get_called_class(), print_r($this, true)]);
+		}
 
 
 		// handle children
