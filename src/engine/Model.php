@@ -133,7 +133,7 @@ class Model implements iModel {
 						}
 					}
 				}
-				$this->$table_name = array_values($children_array);
+				$this->$table_name = ($children_array);
 			}
 		}
 	}
