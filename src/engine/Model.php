@@ -348,6 +348,8 @@ class Model implements iModel {
 				}
 			} elseif($e instanceof Model){
 				$e = $e->output();
+			} elseif($e instanceof Collection){
+				$e = $e->output();
 			}
 		}
 		return $that;
