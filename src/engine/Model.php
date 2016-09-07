@@ -286,7 +286,7 @@ class Model implements iModel {
 	 */
 	private function hasParent(String $what){
 		foreach($this->parents as $p){
-			if(strtolower($p['class_name']) == strtolower($what)){
+			if(strtolower($p['class_name']) == strtolower($what) || strtolower($p['table_name']) == strtolower($what)){
 				return $p;
 			}
 		}
@@ -299,7 +299,7 @@ class Model implements iModel {
 	 */
 	private function hasChild(String $what){
 		foreach($this->children as $p){
-			if(strtolower($p['class_name']).'s' == strtolower($what)){
+			if(strtolower($p['class_name']).'s' == strtolower($what) || strtolower($p['table_name']) == strtolower($what)){
 				return $p;
 			}
 		}
