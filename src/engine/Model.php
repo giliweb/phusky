@@ -72,7 +72,7 @@ class Model implements iModel {
 		foreach($this->children as &$child){
 			$table_name = $child['table_name'];
 			if(isset($this->$table_name)){
-				$children_array = $this->$table_name; // new children array
+				$children_array = $this->$table_name->getData(); // new children collection
 
 				if(count($children_array) <= 0){ // delete all children
 					try {
