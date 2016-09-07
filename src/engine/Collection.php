@@ -65,4 +65,11 @@ class Collection {
 			$e->delete();
 		}
 	}
+
+	/**
+	 * @param Model $o
+	 */
+	public function add(Model $o){
+		$this->data []= $o;
+	}
 }
