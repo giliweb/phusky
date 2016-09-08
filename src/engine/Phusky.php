@@ -74,6 +74,7 @@ require_once 'vendor/autoload.php';
 \\DB::\$dbName = '{$data['db_name']}';
 \\DB::\$user = '{$data['db_user']}';
 \\DB::\$password = '{$data['db_password']}';
+\\DB::\$encoding = 'UTF8';
 spl_autoload_register(function(\$className){
     \$path = '{$data['absolute_class_path']}/';
     include \$path.\$className.'.php';
